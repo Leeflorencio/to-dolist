@@ -97,7 +97,7 @@ public class TarefasServiceImpl implements TarefasService {
 
                     return ResponseEntity.status(HttpStatus.CREATED).body("Tarefa atualizada com sucesso");
             } else {
-                return ResponseEntity.status(HttpStatus.CONFLICT).body("Dados incorretoss");
+                return ResponseEntity.status(HttpStatus.CONFLICT).body("Dados incorretos");
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
