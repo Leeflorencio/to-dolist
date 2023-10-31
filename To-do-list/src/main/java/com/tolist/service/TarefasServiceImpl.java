@@ -83,21 +83,22 @@ public class TarefasServiceImpl implements TarefasService {
     @Override
     public ResponseEntity<Object> atualizar(Long id, TarefasDto tarefas) {
         try {
-            if (repository.existsById(id)) {
-                    var tarefasModel = new TarefasModel();
-                    BeanUtils.copyProperties(tarefas, tarefasModel);
+            Optional<TarefasModel> tarefasModel = repository.findById(id);
+            if(!tarefasModel.isPresent()){
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Tarefa não localizada");
+            }
+            if(tarefas.getNome().isBlank() || tarefas.getDescricao().isBlank()){
+                return ResponseEntity.status(HttpStatus.CONFLICT).body("O nome a descrição da tarefa, não podem estar vazios.");
+            } else{
+                TarefasModel list = tarefasModel.get();
+                list.setNome(tarefas.getNome());
+                list.setDescricao(tarefas.getDescricao());
+                list.setStatus(tarefas.getStatus());
+                list.setPrioridade(tarefas.getPrioridade());
+                list.setDataVencimento(tarefas.getDataVencimento());
 
-                    tarefasModel.setNome(tarefas.getNome());
-                    tarefasModel.setDescricao(tarefas.getDescricao());
-                    tarefasModel.setStatus(tarefas.getStatus());
-                    tarefasModel.setPrioridade(tarefas.getPrioridade());
-                    tarefasModel.setDataVencimento(tarefas.getDataVencimento());
-
-                    repository.save(tarefasModel);
-
-                    return ResponseEntity.status(HttpStatus.CREATED).body("Tarefa atualizada com sucesso");
-            } else {
-                return ResponseEntity.status(HttpStatus.CONFLICT).body("Dados incorretos");
+                repository.save(list);
+                return ResponseEntity.status(HttpStatus.CREATED).body("Tarefa atualizada com sucesso");
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
